@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 
 
 def to_csv_sample_sub_df(n_predictions):
@@ -8,13 +7,14 @@ def to_csv_sample_sub_df(n_predictions):
     sample_submission_df = pd.read_csv("TitanicSpaceshipDatasets/sample_submission.csv")
     sample_submission_df['Transported'] = n_predictions
     sample_submission_df.to_csv('working/submission.csv', index=False)
-    print(sample_submission_df.head())
+    print('[*] Submission csv file successfully updated.')
 
 
 def NaN_to_zero(df, cols):
     # This function takes a DataFrame & its target volumes for
     # converting its NaN values to zero.
-    df[cols] = df[cols].fillna(value=0)
+    for col in cols:
+        df[col] = df[col].fillna(0)
 
 
 def split_and_drop_col(df, cols, col, by):
@@ -25,4 +25,9 @@ def split_and_drop_col(df, cols, col, by):
 
 def bool_to_binary(df, cols):
     for col in cols:
-        df[col] = df[col].astype(int)
+        df[col] = df[col].fillna(0).astype(int)
+
+
+def binary_to_bool(df, cols):
+    for col in cols:
+        df[col] = df[col].astype(bool)

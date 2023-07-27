@@ -5,42 +5,70 @@ https://www.kaggle.com/competitions/spaceship-titanic
 """
 
 import pandas as pd
-import tensorflow_decision_forests as tfdf
 import OptimizeTools as ot
-
+import ExamineData as ed
+from os import system
+from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier, AdaBoostClassifier
+from sklearn.linear_model import LogisticRegression, RidgeClassifier, SGDClassifier
+from sklearn.svm import SVC
+from xgboost import XGBClassifier
+from sklearn.ensemble import VotingClassifier
+from sklearn.model_selection import cross_val_score
 
 def main():
+    try:
+        system('clear')
+    except:
+        system('CLS')
+
     # Load the test & train datasets
-    test_df  = pd.read_csv('TitanicSpaceshipDatasets/test.csv')
+    test_df = pd.read_csv('TitanicSpaceshipDatasets/test.csv')
     train_df = pd.read_csv('TitanicSpaceshipDatasets/train.csv')
 
-    # Replace NaN values with zero
-    ot.NaN_to_zero(test_df,  ['VIP', 'CryoSleep'])
-    ot.NaN_to_zero(train_df, ['VIP', 'CryoSleep'])
+    train_df = ed.exclude_string_columns(train_df)
+    test_df = ed.exclude_string_columns(test_df)
 
-    # Creating New Features - Deck, Cabin_num and Side from the column Cabin and remove Cabin
-    ot.split_and_drop_col(test_df,  ['Deck', 'Cabin_num', 'Side'], 'Cabin', '/')
-    ot.split_and_drop_col(train_df, ['Deck', 'Cabin_num', 'Side'], 'Cabin', '/')
+    # Feature Selection
+    x_train = train_df.drop('Transported', axis=1)
+    y_train = train_df['Transported']
+    x_test = test_df
 
-    # Convert boolean to 1's and 0's
-    ot.bool_to_binary(test_df,  ['VIP', 'CryoSleep'])
-    ot.bool_to_binary(train_df, ['VIP', 'CryoSleep', 'Transported'])
+    ot.NaN_to_zero(x_train, x_train.columns)
+    ot.NaN_to_zero(x_test, x_test.columns)
 
-    # Convert pd dataframe to tf dataset
-    test_ds  = tfdf.keras.pd_dataframe_to_tf_dataset(test_df)
-    train_ds = tfdf.keras.pd_dataframe_to_tf_dataset(train_df, label="Transported")
+    # Model Training and Prediction with hyperparameters
+    model1 = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, max_depth=3)
+    model2 = LogisticRegression(C=1.0, penalty='l2', solver='liblinear')
+    model3 = RandomForestClassifier(n_estimators=200, max_depth=10, random_state=42)
+    model4 = SVC(kernel='rbf', gamma='scale', C=10, probability=True)
+    model5 = XGBClassifier(n_estimators=100, learning_rate=0.1, max_depth=3)
+    model6 = RidgeClassifier(alpha=1.0)
+    model7 = AdaBoostClassifier(n_estimators=100)
+    model8 = SGDClassifier(loss='hinge', penalty='l2', alpha=0.0001, max_iter=1000, random_state=42)
+    model9 = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, max_depth=5)
+    model10 = RandomForestClassifier(n_estimators=200, max_depth=15, random_state=42)
+    model11 = LogisticRegression(C=0.1, penalty='l1', solver='liblinear')
+    model12 = SVC(kernel='linear', gamma='scale', C=1, probability=True)
 
-    rf = tfdf.keras.RandomForestModel(hyperparameter_template="benchmark_rank1")
-    rf.compile(metrics=['accuracy'])
-    rf.fit(x=train_ds)
+    # Create a Voting Classifier with multiple models
+    voting_model = VotingClassifier(estimators=[('gb', model1), ('lr', model2), ('rf', model3), 
+                                                ('svm', model4), ('xgb', model5), ('rc', model6), ('abc', model7), 
+                                                ('sgd', model8), ('gb2', model9), ('rf2', model10), ('lr2', model11), 
+                                                ('svm2', model12)], voting='soft')
 
-    # Get the predictions for testdata
-    predictions = rf.predict(test_ds)
-    n_predictions = (predictions > 0.5).astype(bool)
+    # Perform cross-validation on the voting classifier
+    # print("[+] Performing cross-validation on the voting classifier...")
+    # scores = cross_val_score(voting_model, x_train, y_train, cv=2)
 
-    ot.to_csv_sample_sub_df(n_predictions)
+    # Print the mean cross-validation score
+    # print('Mean Cross-Validation Score:', scores.mean())
 
+    # Fit the model to the training data and make predictions on the test data
+    voting_model.fit(x_train, y_train)
+    y_pred = voting_model.predict(x_test)
 
+    # Create submission file
+    ot.to_csv_sample_sub_df(y_pred)
 
 if __name__ == "__main__":
     main()
