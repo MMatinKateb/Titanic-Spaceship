@@ -4,6 +4,12 @@ Author: Mohammad Matin Kateb
 https://www.kaggle.com/competitions/spaceship-titanic
 """
 
+"""
+Titanic Spaceship Challenge
+Author: Mohammad Matin Kateb
+https://www.kaggle.com/competitions/spaceship-titanic
+"""
+
 import pandas as pd
 import OptimizeTools as ot
 import ExamineData as ed
@@ -13,7 +19,6 @@ from sklearn.linear_model import LogisticRegression, RidgeClassifier, SGDClassif
 from sklearn.svm import SVC
 from xgboost import XGBClassifier
 from sklearn.ensemble import VotingClassifier
-from sklearn.model_selection import cross_val_score
 
 def main():
     try:
@@ -21,10 +26,13 @@ def main():
     except:
         system('CLS')
 
+    print("[+] Performing the model...")
+
     # Load the test & train datasets
     test_df = pd.read_csv('TitanicSpaceshipDatasets/test.csv')
     train_df = pd.read_csv('TitanicSpaceshipDatasets/train.csv')
 
+    # Get rid of string columns
     train_df = ed.exclude_string_columns(train_df)
     test_df = ed.exclude_string_columns(test_df)
 
@@ -56,19 +64,14 @@ def main():
                                                 ('sgd', model8), ('gb2', model9), ('rf2', model10), ('lr2', model11), 
                                                 ('svm2', model12)], voting='soft')
 
-    # Perform cross-validation on the voting classifier
-    # print("[+] Performing cross-validation on the voting classifier...")
-    # scores = cross_val_score(voting_model, x_train, y_train, cv=2)
-
-    # Print the mean cross-validation score
-    # print('Mean Cross-Validation Score:', scores.mean())
-
     # Fit the model to the training data and make predictions on the test data
     voting_model.fit(x_train, y_train)
     y_pred = voting_model.predict(x_test)
 
     # Create submission file
     ot.to_csv_sample_sub_df(y_pred)
+
+
 
 if __name__ == "__main__":
     main()
