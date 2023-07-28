@@ -4,12 +4,6 @@ Author: Mohammad Matin Kateb
 https://www.kaggle.com/competitions/spaceship-titanic
 """
 
-"""
-Titanic Spaceship Challenge
-Author: Mohammad Matin Kateb
-https://www.kaggle.com/competitions/spaceship-titanic
-"""
-
 import pandas as pd
 import OptimizeTools as ot
 import ExamineData as ed
