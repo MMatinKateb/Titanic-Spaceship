@@ -8,10 +8,8 @@ import pandas as pd
 import OptimizeTools as ot
 import ExamineData as ed
 from os import system
-from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier, AdaBoostClassifier
-from sklearn.linear_model import LogisticRegression, RidgeClassifier, SGDClassifier
-from sklearn.svm import SVC
-from xgboost import XGBClassifier
+from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import VotingClassifier
 
 def main():
@@ -42,21 +40,9 @@ def main():
     model1 = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, max_depth=3)
     model2 = LogisticRegression(C=1.0, penalty='l2', solver='liblinear')
     model3 = RandomForestClassifier(n_estimators=200, max_depth=10, random_state=42)
-    model4 = SVC(kernel='rbf', gamma='scale', C=10, probability=True)
-    model5 = XGBClassifier(n_estimators=100, learning_rate=0.1, max_depth=3)
-    model6 = RidgeClassifier(alpha=1.0)
-    model7 = AdaBoostClassifier(n_estimators=100)
-    model8 = SGDClassifier(loss='hinge', penalty='l2', alpha=0.0001, max_iter=1000, random_state=42)
-    model9 = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, max_depth=5)
-    model10 = RandomForestClassifier(n_estimators=200, max_depth=15, random_state=42)
-    model11 = LogisticRegression(C=0.1, penalty='l1', solver='liblinear')
-    model12 = SVC(kernel='linear', gamma='scale', C=1, probability=True)
 
     # Create a Voting Classifier with multiple models
-    voting_model = VotingClassifier(estimators=[('gb', model1), ('lr', model2), ('rf', model3), 
-                                                ('svm', model4), ('xgb', model5), ('rc', model6), ('abc', model7), 
-                                                ('sgd', model8), ('gb2', model9), ('rf2', model10), ('lr2', model11), 
-                                                ('svm2', model12)], voting='soft')
+    voting_model = VotingClassifier(estimators=[('gb', model1), ('lr', model2), ('rf', model3)], voting='soft')
 
     # Fit the model to the training data and make predictions on the test data
     voting_model.fit(x_train, y_train)
