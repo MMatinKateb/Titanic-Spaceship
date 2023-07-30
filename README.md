@@ -1,6 +1,7 @@
 ## Titanic Spaceship
 
-This repository contains the code and resources for the "Titanic Spaceship" machine learning project, developed by Mohammad Matin Kateb.
+This repository contains the code and resources for the "Titanic Spaceship" ML project, developed by Mohammad Matin Kateb as capstone project.
+Supervisor: Dr. Behzad Zamani
 
 ## Project Overview
 
